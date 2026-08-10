@@ -1,4 +1,7 @@
 #include "ModuleRegistry.hpp"
+#include "../core/Runtime.hpp"
+#include <fstream>
+#include <iterator>
 #include "visual/fullbright.hpp"
 #include "visual/motionblur.hpp"
 #include "visual/fpsunlocker.hpp"
@@ -52,6 +55,20 @@ const std::vector<Module*>& ModuleRegistry::modules() const {
 
 void ModuleRegistry::initialize() {
     if (mInitialized) return;
+
+    // BedrockTools ships the Minecraft font with the mod package. Register it
+    // once before any module receives onInit(), so every HUD text command can
+    // use the same font without requiring each module to load it separately.
+    const auto fontPath = bedrocktools::core::Runtime::get().resourceDirectory() / "minecraft.ttf";
+    std::ifstream fontFile(fontPath, std::ios::binary);
+    if (fontFile) {
+        std::vector<unsigned char> font(
+            (std::istreambuf_iterator<char>(fontFile)),
+            std::istreambuf_iterator<char>()
+        );
+        if (!font.empty()) pl::modmenu::registerFont("minecraft", font);
+    }
+
     for (auto* module : mView) module->onInit();
     mInitialized = true;
 }

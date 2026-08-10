@@ -20,7 +20,15 @@
 #define PL_DRAW_IMAGE pl::modmenu::DrawCommandType::Image
 
 inline void submitDrawCommands(std::string_view moduleId, const std::vector<PLModMenu_DrawCommand>& commands) {
-    pl::modmenu::submitDrawCommands(moduleId, commands);
+    // Text commands without an explicit font use the Minecraft font shipped
+    // with BedrockTools. Explicit fontId values remain untouched.
+    std::vector<PLModMenu_DrawCommand> themedCommands = commands;
+    for (auto& command : themedCommands) {
+        if (command.type == PL_DRAW_TEXT && command.fontId.empty()) {
+            command.fontId = "minecraft";
+        }
+    }
+    pl::modmenu::submitDrawCommands(moduleId, themedCommands);
 }
 
 class ModuleRegistry {
