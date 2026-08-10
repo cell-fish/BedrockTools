@@ -18,9 +18,6 @@
 #include <random>
 #include <EGL/egl.h>
 #include <atomic>
-#include "core/Runtime.hpp"
-#include <fstream>
-#include <iterator>
 static DebugMenuModule* g_debugMod = nullptr;
 
 typedef void (*HudCursorRender_t)(void* _this, void* a1, void* a2, void* a3);
@@ -241,13 +238,6 @@ void DebugMenuModule::onFrame() {
     std::list<std::string> stringStore;
 
     if (!m_cacheInit) {
-        const auto fontPath = bedrocktools::core::Runtime::get().resourceDirectory() / "minecraft.ttf";
-        std::ifstream fontFile(fontPath, std::ios::binary);
-        if (fontFile) {
-            std::vector<unsigned char> font((std::istreambuf_iterator<char>(fontFile)), std::istreambuf_iterator<char>());
-            if (!font.empty()) pl::modmenu::registerFont("minecraft", font);
-        }
-        
         char model[92] = {0};
         __system_property_get("ro.product.model", model);
         char brand[92] = {0};
@@ -497,7 +487,6 @@ void DebugMenuModule::onFrame() {
             txtCmd.h = 0.f;
             txtCmd.color = line.color;
             txtCmd.size = fontSz;
-            txtCmd.fontId = "minecraft";
             txtCmd.text = stringStore.back().c_str(); 
             cmds.push_back(txtCmd);
             
@@ -521,7 +510,6 @@ void DebugMenuModule::onFrame() {
             txtCmd.h = 0.f;
             txtCmd.color = line.color;
             txtCmd.size = fontSz;
-            txtCmd.fontId = "minecraft";
             txtCmd.text = stringStore.back().c_str(); 
             cmds.push_back(txtCmd);
             
